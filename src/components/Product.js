@@ -1,16 +1,42 @@
 import React from "react";
 import styled from "styled-components";
+import { db } from "./firebase";
 
-function Product() {
+function Product({ title, price, rating, image, id }) {
+  const addToCart = () => {
+    const cartItem = db.collection("cartitems").doc(id);
+    cartItem.get().then((doc) => {
+      console.log(doc);
+      if (doc.exists) {
+        cartItem.update({
+          quantity: doc.data().quantity + 1,
+        });
+      } else {
+        db.collection("cartitems").doc(id).set({
+          name: title,
+          image: image,
+          price: price,
+          quantity: 1,
+        });
+      }
+    });
+  };
+
   return (
     <Container>
-      <Title>qereqrg</Title>
-      <Price>123</Price>
-      <Rating>⭐⭐⭐⭐⭐</Rating>
-      <Image src={`https://images-na.ssl-images-amazon.com/images/I/81SGb5l%2BlZL._AC_SX342_.jpg`} />
+      <Title>{title}</Title>
+      <Price>$ {price}</Price>
+      <Rating>
+        {Array(rating)
+          .fill()
+          .map(() => (
+            <p>⭐</p>
+          ))}
+      </Rating>
+      <Image src={image} />
 
       <ActionSection>
-        <AddToCartButton>Add to Cart</AddToCartButton>
+        <AddToCartButton onClick={addToCart}>Add to Cart</AddToCartButton>
       </ActionSection>
     </Container>
   );
@@ -36,7 +62,9 @@ const Price = styled.span`
   margin-top: 3px;
 `;
 
-const Rating = styled.div``;
+const Rating = styled.div`
+  display: flex;
+`;
 
 const Image = styled.img`
   max-height: 200px;
@@ -49,6 +77,7 @@ const AddToCartButton = styled.button`
   background-color: #f0c14b;
   border: 2px solid #a77734;
   border-radius: 2px;
+  cursor: pointer;
 `;
 const ActionSection = styled.div`
   display: flex;

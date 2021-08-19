@@ -1,16 +1,45 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Product from "./Product";
+import { db } from "./firebase";
 
 function Home() {
+  const [products, setProducts] = useState([]);
+
+  const getProduct = () => {
+    db.collection("products").onSnapshot((snapshot) => {
+      let tempProducts = [];
+
+      tempProducts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        product: doc.data(),
+      }));
+
+      setProducts(tempProducts);
+    });
+  };
+
+  useEffect(() => {
+    getProduct();
+    console.log(products);
+  }, []);
+
   return (
     <Container>
-      <Banner>
-      </Banner>
+      <Banner></Banner>
 
       <Content>
-        <Product/>
-        <Product/>
+        {
+          products.map(data => (
+            <Product 
+              id={data.id}
+              title={data.product.name}
+              price={data.product.price}
+              rating={data.product.rating}
+              image={data.product.image}
+            />
+          ))
+        }
       </Content>
     </Container>
   );
@@ -24,12 +53,12 @@ const Container = styled.div`
 `;
 
 const Banner = styled.div`
-  background-image: url('https://i.imgur.com/SYHeuYM.jpg');
+  background-image: url("https://i.imgur.com/SYHeuYM.jpg");
   min-height: 600px;
   background-position: center;
   background-size: cover;
   z-index: 1;
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1),rgba(0,0,0,0));
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 `;
 
 const Content = styled.div`
