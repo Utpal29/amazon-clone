@@ -1,12 +1,26 @@
 import React from "react";
 import styled from "styled-components";
+import { db } from "./firebase";
 
 const CartItem = ({ id, item }) => {
+  const deleteItem = (e) => {
+    e.preventDefault();
+    db.collection("cartitems").doc(id).delete();
+  };
+
   let options = [];
 
   for (let i = 1; i < Math.max(item.quantity + 1, 20); i++) {
     options.push(<option value={i}>Qty: {i}</option>);
   }
+
+  const changeQuantity = (newQuantity) => {
+    db.collection("cartitems")
+      .doc(id)
+      .update({
+        quantity: parseInt(newQuantity),
+      });
+  };
 
   return (
     <Container>
@@ -22,11 +36,14 @@ const CartItem = ({ id, item }) => {
           <CartItemQuantityContainer>
             <select
               value={item.quantity}
+              onChange={(e) => changeQuantity(e.target.value)}
             >
               {options}
             </select>
           </CartItemQuantityContainer>
-          <CartItemDeleteContainer>Delete</CartItemDeleteContainer>
+          <CartItemDeleteContainer onClick={deleteItem}>
+            Delete
+          </CartItemDeleteContainer>
         </CartItemInfoBottom>
       </CartItemInfo>
 
@@ -41,7 +58,7 @@ const Container = styled.div`
   padding-top: 12px;
   padding-bottom: 12px;
   display: flex;
-  border-bottom: 1px solid #DDD;
+  border-bottom: 1px solid #ddd;
 `;
 
 const ImageContainer = styled.div`
@@ -76,9 +93,9 @@ const CartItemInfoBottom = styled.div`
 const CartItemQuantityContainer = styled.div`
   select {
     border-radius: 7px;
-    background-color: #F0F2F2;
+    background-color: #f0f2f2;
     padding: 8px;
-    box-shadow: 0 2px 5px rgba(15,17,17,.15);
+    box-shadow: 0 2px 5px rgba(15, 17, 17, 0.15);
 
     :focus {
       outline: none;
