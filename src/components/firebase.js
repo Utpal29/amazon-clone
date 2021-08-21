@@ -8,9 +8,11 @@ const firebaseApp = firebase.initializeApp({
   storageBucket: "clone-3ab36.appspot.com",
   messagingSenderId: "868812503254",
   appId: "1:868812503254:web:3b9430b4e55af42f287177",
-  measurementId: "G-QTT0WTWB83"
-})
+  measurementId: "G-QTT0WTWB83",
+});
 
 const db = firebase.firestore();
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
 
-export { db };
+export { auth, db, provider };
